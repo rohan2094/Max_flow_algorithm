@@ -1,13 +1,3 @@
-/*
-DSA PROJECT (CS201) SUBMISSION
-Topic -> Maximum Flow using Ford Fullkerson's Algorithm
-$$ Created by ->
-    Rohan (2020CSB1117) 
-    Raghav (2020CSB1115) 
-    Rohit Kinha (2020CSB1118) 
-*/
-
-// Header files included
 #include <stdio.h>
 #include <stdlib.h>
 #define MAX_NODES 10000 // Assuming there will be atmost 10000 Nodes
@@ -20,11 +10,17 @@ $$ Created by ->
 int N;      // Number of vertices
 int Source; // Source Vertex
 int Sink;   // Sink Vertex
+int parent[MAX_NODES];
 
 int Capacity[MAX_NODES][MAX_NODES]; // 2D matrix to store Capacities of edges \
 // Capacity[i][j] will store capacity of edge (i->j)
+int flow[MAX_NODES][MAX_NODES]; // flow matrix
 
 int color[MAX_NODES]; // Needed in BFS part
+
+int min (int x, int y) {
+    return x<y ? x : y;  // returns minimum of x and y
+}
 
 // structure for queue
 struct queue
@@ -70,36 +66,65 @@ int dequeue()
         return temp;
     }
 }
-void BFS(int Capacity[][], int source, int N)
+int BFS(int graph[N][N],int src, int snk)
 {
-    int i = source, j;
+    int source = src, j;
 
     int visited[] = {0};
 
-    printf("%d ", i);
-    visited[i] = 1;
-    enqueue(i);
+    printf("%d ", source);
+    visited[source] = 1;
+    enqueue(source);
     int u = dequeue();
     while (u != -1)
     {
-        
+
         for (j = 1; j < N; j++)
         {
-            if (Capacity[i][j] != 0 && visited[j] == 0)
+            if (Capacity[source][j] != 0 && visited[j] == 0)
             {
                 printf("%d ", j);
                 visited[j] = 1;
                 enqueue(j);
+                parent[j]=u;
             }
         }
         u = dequeue();
     }
+    return visited[snk]=1;
 }
 
-int MaxFlowCalculate()
+int MaxFlowCalculate(int source, int sink)
 {
     int max_flow = 0;
-    // Logic to be added
+    int rCapacity[N][N];
+    for(int i=0;i<N;i++)
+    {
+        for(int j=0;j<N;j++)
+        {
+            rCapacity[i][j]=Capacity[i][j];
+        }
+    }
+    int parent[N];
+    while(BFS(rCapacity,source,sink))
+    {
+        int PathFlow = 1e9;
+
+        for(int i= sink;i!=source;i=parent[i])
+        {
+            PathFlow=min(PathFlow, rCapacity[parent[i]][i]);
+        }
+
+        for(int i= sink;i!=source;i=parent[i])
+        {
+            rCapacity[parent[i]][i] = rCapacity[parent[i]][i] - PathFlow;
+            rCapacity[i][parent[i]] = rCapacity[i][parent[i]] + PathFlow;
+        }
+
+        max_flow = max_flow + PathFlow;
+
+    }
+
     return max_flow;
 }
 
@@ -137,6 +162,6 @@ int main()
     printf("Enter the sink vertex: ");
     scanf("%d", &Sink);
 
-    printf("Maximum flow from vertex %d to vertex %d is %d\n", Source, Sink, MaxFlowCalculate());
+    printf("Maximum flow from vertex %d to vertex %d is %d\n", Source, Sink, MaxFlowCalculate(Source,Sink));
     return 0;
 }
