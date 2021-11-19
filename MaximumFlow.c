@@ -8,19 +8,12 @@
 //#define BLACK 2
 
 int N;      // Number of vertices
-int Source; // Source Vertex
-int Sink;   // Sink Vertex
-int parent[MAX_NODES];
 
 int Capacity[MAX_NODES][MAX_NODES]; // 2D matrix to store Capacities of edges \
 // Capacity[i][j] will store capacity of edge (i->j)
 int flow[MAX_NODES][MAX_NODES]; // flow matrix
 
 int color[MAX_NODES]; // Needed in BFS part
-
-int min (int x, int y) {
-    return x<y ? x : y;  // returns minimum of x and y
-}
 
 // structure for queue
 struct queue
@@ -34,10 +27,6 @@ void enqueue(int x)
 {
     struct queue *t;
     t = (struct queue *)malloc(sizeof(struct queue));
-    if (t == NULL)
-        printf("Queue is Full\n");
-    else
-    {
         t->data = x;
         t->next = NULL;
         if (front == NULL)
@@ -47,7 +36,6 @@ void enqueue(int x)
             rear->next = t;
             rear = t;
         }
-    }
 }
 // delete an element from queue
 int dequeue()
@@ -57,47 +45,72 @@ int dequeue()
     {
         return -1; // the function will return -1 if queue is empty
     }
-    else // else it will return the value at front
-    {
+     // else it will return the value at front
+
         int temp = front->data;
         t = front;
         front = front->next;
         free(t);
         return temp;
-    }
+
 }
-int BFS(int graph[N][N],int src, int snk)
+
+int BFS(int rgraph[N][N],int src, int snk,int parent[N])
 {
-    int source = src, j;
+    int ssrc = src;
+    int x=0;
+    int visited[N];
 
-    int visited[] = {0};
+    for(int i=0;i<N;i++) visited[i]=0;
 
-    printf("%d ", source);
-    visited[source] = 1;
-    enqueue(source);
+    enqueue(ssrc);
+    visited[ssrc] = 1;
+    parent[ssrc]=-1;
+
+    //printf("%d  ",ssrc);
     int u = dequeue();
+    //printf()
+    /*for(int i=0;i<N;i++)
+    {
+        printf("%d ",rgraph[u][i]);
+    }*/
     while (u != -1)
     {
 
-        for (j = 1; j < N; j++)
+        for (int j = 0; j < N; j++)
         {
-            if (Capacity[source][j] != 0 && visited[j] == 0)
+            //printf("%d\n",rgraph[u][j]);
+            //printf("%d ",j);
+            if (rgraph[u][j] > 0 && visited[j] == 0)
             {
-                printf("%d ", j);
                 visited[j] = 1;
+                //printf("%d -> %d \n",j,visited[j]);
                 enqueue(j);
+                //printf("%d  ",j);
                 parent[j]=u;
+                //printf("%d -> %d\n",u,j);
+                if(j==snk)
+                {
+                    x=1;
+                    break;
+                }
+                //printf("YESSSS00");
+
             }
+            //else printf("NO");
         }
         u = dequeue();
+        //printf("%d  ", u);
     }
-    return visited[snk]=1;
+    if(x==1) return 1;
+    else return 0;
 }
 
-int MaxFlowCalculate(int source, int sink)
+int MaxFlowCalculate(int so, int si)
 {
     int max_flow = 0;
     int rCapacity[N][N];
+    int parent[N];
     for(int i=0;i<N;i++)
     {
         for(int j=0;j<N;j++)
@@ -105,22 +118,29 @@ int MaxFlowCalculate(int source, int sink)
             rCapacity[i][j]=Capacity[i][j];
         }
     }
-    int parent[N];
-    while(BFS(rCapacity,source,sink))
+
+    while(BFS(rCapacity,so,si,parent))
     {
-        int PathFlow = 1e9;
-
-        for(int i= sink;i!=source;i=parent[i])
+        long long int PathFlow = 1e9;
+        //printf("YES");
+        for(int i= si;i!=so;i=parent[i])
         {
-            PathFlow=min(PathFlow, rCapacity[parent[i]][i]);
+            //printf("%d->%d \n",parent[i],i);
+            //printf("IFEO");
+            //PathFlow=min(PathFlow, rCapacity[parent[i]][i]);
+            if(PathFlow<rCapacity[parent[i]][i])
+                PathFlow=PathFlow;
+            else PathFlow=rCapacity[parent[i]][i];
+            //printf("hj");
         }
-
-        for(int i= sink;i!=source;i=parent[i])
+        //printf("YHATK");
+        for(int i= si;i!=so;i=parent[i])
         {
             rCapacity[parent[i]][i] = rCapacity[parent[i]][i] - PathFlow;
+            //printf("%d->%d = %d \n",parent[i],i,rCapacity[parent[i]][i]);
             rCapacity[i][parent[i]] = rCapacity[i][parent[i]] + PathFlow;
         }
-
+        //printf("YHABHI");
         max_flow = max_flow + PathFlow;
 
     }
@@ -156,7 +176,7 @@ int main()
         scanf("%d %d", &right, &cap);
         Capacity[left][right] = cap;
     }
-
+    int Source,Sink;
     printf("Enter the source vertex: ");
     scanf("%d", &Source);
     printf("Enter the sink vertex: ");
