@@ -1,3 +1,10 @@
+// CS201 Project Submission
+// TOPIC - Maximum Flow using Ford-Fulkerson's Algorithm
+/* Created by -
+   * Rohan (2020CSB1117)
+   * Raghav Patidar (2020CSB1115)
+   * Rohit Kinha (2020CSB1118)
+*/
 #include <stdio.h>
 #include <stdlib.h>
 #define MAX_NODES 10000 // Assuming there will be atmost 10000 Nodes
