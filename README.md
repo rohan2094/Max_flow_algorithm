@@ -9,7 +9,7 @@ PROGRAM RUNNING INSTRUCTIONS :
 At first user will input number of vertices.
 Then program will ask you to input your network flow diagram.
 For this, You have to input all the edges of Graph with there capacity as three space separated integers.
-For example for edge(i to j) with capacity C , you will give input "i j C" and then press Enter
+For example for edge(i to j) with capacity C , you will give input "i j C" and then press Enter.
 Do the same for all edges until you are done.
 Once you are done, Enter -1 to stop taking further inputs.
 
